@@ -25,19 +25,19 @@ Invite the bot to your guild                       https://goo.gl/aQm2G7
 Join the official development guild                https://discord.gg/uekTNPj
 """
 
-BASE_URL = "https://translation.googleapis.com"
+BASE_URL = "https://api.cognitive.microsofttranslator.com"
 _ = Translator("Translate", __file__)
-log = logging.getLogger("red.trusty-cogs.Translate")
+log = logging.getLogger("red.Ubivis-Cogs.Bing")
 
 
 @cog_i18n(_)
-class Translate(GoogleTranslateAPI, commands.Cog):
+class Bing(GoogleTranslateAPI, commands.Cog):
     """
     Translate messages using Google Translate
     """
 
-    __author__ = ["Aziz", "TrustyJAID"]
-    __version__ = "2.3.6"
+    __author__ = ["Ubivis", "Ubivis-Cogs"]
+    __version__ = "0.0.1"
 
     def __init__(self, bot):
         self.bot = bot
