@@ -439,7 +439,7 @@ class Translate(BingTranslateAPI, commands.Cog):
         """
         msg = _(
             "1. Go to Azure Portal and log in with your Live Developer account."
-            "(https://portal.azure.com//)\n"
+            "(https://portal.azure.com/)\n"
             "2. Create a new \"Translation\" Service.\n"
             "3. Select a plan that fits your needs.\n"
             "4. Click on Keys and EndPoints on the left navigation bar.\n"
