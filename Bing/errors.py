@@ -1,4 +1,4 @@
-class GoogleTranslateAPIError(Exception):
-    """Raised when google translate has an oopsie"""
+class BingTranslateAPIError(Exception):
+    """Raised when Bing translate fails"""
 
     pass

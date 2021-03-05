@@ -7,9 +7,9 @@ from redbot.core import Config, checks, commands, version_info, VersionInfo
 from redbot.core.i18n import Translator, cog_i18n
 from redbot.core.utils.chat_formatting import humanize_list
 
-from .api import FlagTranslation, GoogleTranslateAPI
+from .api import FlagTranslation, BingTranslateAPI
 from .converters import ChannelUserRole
-from .errors import GoogleTranslateAPIError
+from .errors import BingTranslateAPIError
 
 """
 Translator cog
@@ -27,17 +27,17 @@ Join the official development guild                https://discord.gg/uekTNPj
 
 BASE_URL = "https://api.cognitive.microsofttranslator.com"
 _ = Translator("Translate", __file__)
-log = logging.getLogger("red.Ubivis-Cogs.Bing")
+log = logging.getLogger("red.trusty-cogs.Translate")
 
 
 @cog_i18n(_)
-class Bing(GoogleTranslateAPI, commands.Cog):
+class Translate(BingTranslateAPI, commands.Cog):
     """
-    Translate messages using Google Translate
+    Translate messages using Bing Translate
     """
 
-    __author__ = ["Ubivis", "Ubivis-Cogs"]
-    __version__ = "0.0.1"
+    __author__ = ["Aziz", "TrustyJAID"]
+    __version__ = "2.3.6"
 
     def __init__(self, bot):
         self.bot = bot
@@ -89,15 +89,15 @@ class Bing(GoogleTranslateAPI, commands.Cog):
         except AttributeError:
             return
         try:
-            central_key = await self.bot.get_shared_api_tokens("google_translate")
+            central_key = await self.bot.get_shared_api_tokens("bing_translate")
         except AttributeError:
             # Red 3.1 support
-            central_key = await self.bot.db.api_tokens.get_raw("google_translate", default={})
+            central_key = await self.bot.db.api_tokens.get_raw("bing_translate", default={})
         if not central_key:
             try:
-                await self.bot.set_shared_api_tokens("google_translate", api_key=key)
+                await self.bot.set_shared_api_tokens("bing_translate", api_key=key)
             except AttributeError:
-                await self.bot.db.api_tokens.set_raw("google_translate", value={"api_key": key})
+                await self.bot.db.api_tokens.set_raw("bing_translate", value={"api_key": key})
         await self.config.api_key.clear()
         self._global_counter = await self.config.count()
         all_guilds = await self.config.all_guilds()
@@ -113,14 +113,14 @@ class Bing(GoogleTranslateAPI, commands.Cog):
         message: Union[discord.Message, str],
     ) -> None:
         """
-        Translate messages with Google Translate
+        Translate messages with Bing Translate
 
         `<to_language>` is the language you would like to translate
         `<message>` is the message to translate, this can be words you want
         to translate, a channelID-messageID from SHIFT + clicking a message and copying ID,
         a message ID from the current channel, or message link
         """
-        if not await self._get_google_api_key():
+        if not await self._get_bing_api_key():
             msg = _("The bot owner needs to set an api key first!")
             await ctx.send(msg)
             return
@@ -134,7 +134,7 @@ class Bing(GoogleTranslateAPI, commands.Cog):
         try:
             detected_lang = await self.detect_language(message)
             await self.add_detect(ctx.guild)
-        except GoogleTranslateAPIError as e:
+        except BingTranslateAPIError as e:
             await ctx.send(str(e))
             return
         from_lang = detected_lang[0][0]["language"]
@@ -148,7 +148,7 @@ class Bing(GoogleTranslateAPI, commands.Cog):
         try:
             translated_text = await self.translate_text(original_lang, to_language, message)
             await self.add_requests(ctx.guild, message)
-        except GoogleTranslateAPIError as e:
+        except BingTranslateAPIError as e:
             await ctx.send(str(e))
             return
 
@@ -433,23 +433,17 @@ class Bing(GoogleTranslateAPI, commands.Cog):
     @checks.is_owner()
     async def creds(self, ctx: commands.Context) -> None:
         """
-        You must get an API key from Google to set this up
+        You must get an API key from Bing to set this up
 
-        Note: Using this cog costs money, current rates are $20 per 1 million characters.
+        Note: Using this cog professional costs money, free version available for up to 2 Million characters per Month.
         """
         msg = _(
-            "1. Go to Google Developers Console and log in with your Google account."
-            "(https://console.developers.google.com/)\n"
-            "2. You should be prompted to create a new project (name does not matter).\n"
-            "3. Click on Enable APIs and Services at the top.\n"
-            "4. In the list of APIs choose or search for Cloud Translate API and click on it."
-            "Choose Enable.\n"
-            "5. Click on Credentials on the left navigation bar.\n"
-            "6. Click on Create Credential at the top.\n"
-            '7. At the top click the link for "API key".\n'
-            "8. No application restrictions are needed. Click Create at the bottom.\n"
-            "9. You now have a key to add to \n"
-            "`{prefix}set api google_translate api_key,YOUR_KEY_HERE`\n"
+            "1. Go to Azure Portal and log in with your Live Developer account."
+            "(https://portal.azure.com//)\n"
+            "2. Create a new \"Translation\" Service.\n"
+            "3. Select a plan that fits your needs.\n"
+            "4. Click on Keys and EndPoints on the left navigation bar.\n"
+            "`{prefix}set api bing_translate api_key,YOUR_KEY_HERE`\n"
         ).format(prefix=ctx.prefix)
         await ctx.maybe_send_embed(msg)
 
