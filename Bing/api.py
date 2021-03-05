@@ -14,10 +14,10 @@ from redbot.core import Config, VersionInfo, commands, version_info
 from redbot.core.bot import Red
 from redbot.core.i18n import Translator
 
-from .errors import GoogleTranslateAPIError
+from .errors import BingTranslateAPIError
 from .flags import FLAGS
 
-BASE_URL = "https://translation.googleapis.com"
+BASE_URL = "https://api.cognitive.microsofttranslator.com"
 _ = Translator("Translate", __file__)
 log = logging.getLogger("red.trusty-cogs.Translate")
 
@@ -57,7 +57,7 @@ class FlagTranslation(Converter):
         return result
 
 
-class GoogleTranslateAPI:
+class BingTranslateAPI:
     config: Config
     bot: Red
     cache: dict
@@ -124,14 +124,14 @@ class GoogleTranslateAPI:
         self._global_counter["requests"] += 1
         self._global_counter["characters"] += len(message)
 
-    async def _get_google_api_key(self) -> Optional[str]:
+    async def _get_bing_api_key(self) -> Optional[str]:
         key = {}
         if not self._key:
             try:
-                key = await self.bot.get_shared_api_tokens("google_translate")
+                key = await self.bot.get_shared_api_tokens("bing_translate")
             except AttributeError:
                 # Red 3.1 support
-                key = await self.bot.db.api_tokens.get_raw("google_translate", default={})
+                key = await self.bot.db.api_tokens.get_raw("bing_translate", default={})
             self._key = key.get("api_key")
         return self._key
 
@@ -191,7 +191,7 @@ class GoogleTranslateAPI:
                 data = await resp.json()
         if "error" in data:
             log.error(data["error"]["message"])
-            raise GoogleTranslateAPIError(data["error"]["message"])
+            raise BingTranslateAPIError(data["error"]["message"])
         return data["data"]["detections"]
 
     async def translation_embed(
@@ -233,7 +233,7 @@ class GoogleTranslateAPI:
             return None
         if "error" in data:
             log.error(data["error"]["message"])
-            raise GoogleTranslateAPIError(data["error"]["message"])
+            raise BingTranslateAPIError(data["error"]["message"])
         if "data" in data:
             translated_text: str = data["data"]["translations"][0]["translatedText"]
         return translated_text
@@ -252,7 +252,7 @@ class GoogleTranslateAPI:
             return
         if message.author.bot:
             return
-        if not await self._get_google_api_key():
+        if not await self._get_bing_api_key():
             return
         author = cast(discord.Member, message.author)
         channel = cast(discord.TextChannel, message.channel)
@@ -294,7 +294,7 @@ class GoogleTranslateAPI:
             return
         if str(payload.emoji) not in FLAGS:
             return
-        if not await self._get_google_api_key():
+        if not await self._get_bing_api_key():
             return
         channel = self.bot.get_channel(id=payload.channel_id)
         if not channel:
@@ -370,7 +370,7 @@ class GoogleTranslateAPI:
         try:
             detected_lang = await self.detect_language(to_translate)
             await self.add_detect(guild)
-        except GoogleTranslateAPIError:
+        except BingTranslateAPIError:
             return
         except Exception:
             log.exception("Error detecting language")
@@ -497,7 +497,7 @@ class GoogleTranslateAPI:
     async def on_red_api_tokens_update(
         self, service_name: str, api_tokens: Mapping[str, str]
     ) -> None:
-        if service_name != "google_translate":
+        if service_name != "bing_translate":
             return
 
         self._key = None
