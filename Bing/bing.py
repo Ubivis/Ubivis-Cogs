@@ -443,6 +443,7 @@ class Translate(BingTranslateAPI, commands.Cog):
             "2. Create a new \"Translation\" Service.\n"
             "3. Select a plan that fits your needs.\n"
             "4. Click on Keys and EndPoints on the left navigation bar.\n"
+			"5. Copy one of the provided keys (you only need one of the two).\n"
             "`{prefix}set api bing_translate api_key,YOUR_KEY_HERE`\n"
         ).format(prefix=ctx.prefix)
         await ctx.maybe_send_embed(msg)
