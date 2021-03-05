@@ -3,7 +3,7 @@
 [![Discord.py](https://img.shields.io/badge/Discord.py-rewrite-blue.svg)](https://github.com/Rapptz/discord.py/tree/rewrite)
 
 Ubivis Cogs for  [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot/tree/V3/develop).
-To add the cogs to your instance please do: `[p]repo add Trusty-cogs https://github.com/Ubivis/Ubivis-Cogs/`
+To add the cogs to your instance please do: `[p]repo add Ubivis-Cogs https://github.com/Ubivis/Ubivis-Cogs/`
 
 ## About Cogs
 
