@@ -184,15 +184,20 @@ class BingTranslateAPI:
         """
         Detect the language from given text
         """
-        params = {"q": text, "key": self._key}
-        url = BASE_URL + "/language/translate/v2/detect"
+        params = [{"text": text}]
+		headers = {
+			'Ocp-Apim-Subscription-Key': self._key,
+			'Content-type': 'application/json',
+			'Content-Length': len(text);
+		}
+        url = BASE_URL + "/detect?api-version=3.0"
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params) as resp:
+            async with session.post(url, headers=headers, json=params) as resp:
                 data = await resp.json()
         if "error" in data:
             log.error(data["error"]["message"])
             raise BingTranslateAPIError(data["error"]["message"])
-        return data["data"]["detections"]
+        return data["language"]
 
     async def translation_embed(
         self,
@@ -217,17 +222,19 @@ class BingTranslateAPI:
         request to translate the text
         """
         formatting = "text"
+		        params = [{"text": text}]
+		headers = {
+			'Ocp-Apim-Subscription-Key': self._key,
+			'Content-type': 'application/json',
+			'Content-Length': len(text);
+		}
         params = {
-            "q": text,
-            "target": target,
-            "key": self._key,
-            "format": formatting,
-            "source": from_lang,
+            "text": text,
         }
-        url = BASE_URL + "/language/translate/v2"
+        url = BASE_URL + "/translate?api-version=3.0&from"+ from_lang+"&to=" + target
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, params=params) as resp:
+                async with session.post(url, headers=headers, json=params) as resp:
                     data = await resp.json()
         except Exception:
             return None
@@ -235,7 +242,7 @@ class BingTranslateAPI:
             log.error(data["error"]["message"])
             raise BingTranslateAPIError(data["error"]["message"])
         if "data" in data:
-            translated_text: str = data["data"]["translations"][0]["translatedText"]
+            translated_text: str = data[0]["text"]
         return translated_text
 
     @commands.Cog.listener()
